@@ -117,4 +117,3 @@ MIT
 ---
 
 > Made with ❤️ using Spring Boot
-```
