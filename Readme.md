@@ -65,7 +65,7 @@ spring.jpa.show-sql=true
 mvn spring-boot:run
 ```
 
-App will start on: [http://localhost:8080](http://localhost:8080)
+App will start on: [http://localhost:8081](http://localhost:8081)
 
 ---
 
