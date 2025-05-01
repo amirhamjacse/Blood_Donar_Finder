@@ -20,3 +20,4 @@ public class Donor {
     public String getBloodGroup() { return bloodGroup; }
     public void setBloodGroup(String bloodGroup) { this.bloodGroup = bloodGroup; }
 }
+
