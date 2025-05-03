@@ -3,6 +3,7 @@ package com.blooddonar.finder.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class User {
 
-    private enum BloodGroup {
+    public enum BloodGroup {
         A_POS,
         A_NEG,
         B_POS,
@@ -51,4 +52,7 @@ public class User {
 
     @Column(name = "last_donation_date")
     private LocalDate lastDonationDate;
+
+    @Column(nullable = false)
+    private boolean available = true; // New field
 }
