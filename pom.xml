@@ -70,6 +70,13 @@
 			<version>8.3.0</version>
 		</dependency>
 
+		<!--Smtp Mail service dependency-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+
 
 	</dependencies>
 
