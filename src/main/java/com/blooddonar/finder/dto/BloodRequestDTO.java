@@ -7,4 +7,8 @@ import lombok.Data;
 public class BloodRequestDTO {
     private BloodGroup bloodGroup; // Blood group for the request
     private String district;       // District where blood is needed
+    private String contactNumber;  // Requester's contact number
+    private String message;        // Optional custom message
+    private String name;           // Requester's name (new)
+    private String email;          // Requester's email (new)
 }

@@ -14,6 +14,7 @@ public class BloodRequestController {
 
     @PostMapping("/{userId}")
     public String sendRequest(@PathVariable Long userId, @RequestBody BloodRequestDTO requestDTO) {
+        // System.err.println("working ................");
         int notified = requestService.sendBloodRequest(userId, requestDTO);
         return notified + " donor(s) have been notified.";
     }

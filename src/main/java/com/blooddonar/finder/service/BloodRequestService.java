@@ -21,10 +21,9 @@ public class BloodRequestService {
     private EmailService emailService;
 
     @Transactional
-    public int sendBloodRequest(Long requesterId, BloodRequestDTO requestDTO) {
-        User requester = userRepository.findById(requesterId)
-                .orElseThrow(() -> new RuntimeException("Requester not found"));
+    public int sendBloodRequest(Long userId, BloodRequestDTO requestDTO) {
 
+        // Find donors by blood group, district, and availability
         List<User> eligibleDonors = userRepository
                 .findByBloodGroupAndDistrictAndAvailable(
                         requestDTO.getBloodGroup(),
@@ -32,21 +31,31 @@ public class BloodRequestService {
                         true
                 );
 
+        // Filter donors who haven't donated in last 3 months
         List<User> finalDonors = eligibleDonors.stream()
                 .filter(user -> user.getLastDonationDate() == null ||
                         user.getLastDonationDate().isBefore(LocalDate.now().minusMonths(3)))
                 .collect(Collectors.toList());
 
+        // Notify each eligible donor by email
         for (User donor : finalDonors) {
-            String subject = "Urgent Blood Request for " + requestDTO.getBloodGroup();
+            String subject = "Urgent Blood Request - " + requestDTO.getBloodGroup();
+
             String body = "Dear " + donor.getName() + ",\n\n" +
-                    requester.getName() + " needs blood (" + requestDTO.getBloodGroup() + ") in " +
-                    requestDTO.getDistrict() + ".\n\nContact: " + requester.getPhone() +
-                    "\nEmail: " + requester.getEmail() + "\n\nThank you for being a life-saver!";
+                    "🚨 A blood donation request has been made by " + requestDTO.getName() + ".\n\n" +
+                    "🩸 Blood Group: " + requestDTO.getBloodGroup() + "\n" +
+                    "📍 Location: " + requestDTO.getDistrict() + "\n" +
+                    "📞 Contact Number: " + requestDTO.getContactNumber() + "\n" +
+                    "📧 Email: " + requestDTO.getEmail() + "\n\n" +
+                    "📝 Message from requester:\n" +
+                    requestDTO.getMessage() + "\n\n" +
+                    "🙏 Please consider donating if you are eligible.\n\n" +
+                    "Thank you for being a life-saver!\n\n" +
+                    "— Blood Donor Finder Team";
 
             emailService.sendEmail(donor.getEmail(), subject, body);
         }
 
-        return finalDonors.size();
+        return finalDonors.size(); // Number of notified donors
     }
 }
