@@ -1,13 +1,17 @@
 package com.blooddonar.finder.service;
 
 import com.blooddonar.finder.dto.BloodRequestDTO;
+import com.blooddonar.finder.model.BloodRequest;
 import com.blooddonar.finder.model.User;
 import com.blooddonar.finder.repository.UserRepository;
+import com.blooddonar.finder.repository.BloodRequestRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.blooddonar.finder.model.Status;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,10 +22,13 @@ public class BloodRequestService {
     private UserRepository userRepository;
 
     @Autowired
+    private BloodRequestRepository bloodRequestRepository;
+
+    @Autowired
     private EmailService emailService;
 
     @Transactional
-    public int sendBloodRequest(Long userId, BloodRequestDTO requestDTO) {
+    public int sendBloodRequest(BloodRequestDTO requestDTO) {
 
         // Find donors by blood group, district, and availability
         List<User> eligibleDonors = userRepository
@@ -54,6 +61,19 @@ public class BloodRequestService {
                     "— Blood Donor Finder Team";
 
             emailService.sendEmail(donor.getEmail(), subject, body);
+
+            // Save the blood request for the donor
+            // send blood request to the user
+                BloodRequest bloodRequest = new BloodRequest();
+                bloodRequest.setCity(requestDTO.getCity());
+                bloodRequest.setDistrict(requestDTO.getDistrict());
+                bloodRequest.setMessage(requestDTO.getMessage());
+                bloodRequest.setRequestTime(LocalDateTime.now());
+                bloodRequest.setStatus(Status.PENDING);
+                bloodRequest.setBgGroup(requestDTO.getBloodGroup());
+                
+            bloodRequest.setRequesterId(donor.getId(), requestDTO.getRequesterId());
+            bloodRequestRepository.save(bloodRequest);
         }
 
         return finalDonors.size(); // Number of notified donors
