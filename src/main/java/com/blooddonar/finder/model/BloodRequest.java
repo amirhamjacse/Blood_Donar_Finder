@@ -80,4 +80,37 @@ public class BloodRequest {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    public BloodGroup getBgGroup() {
+        return bgGroup;
+    }
+
+    public User getRequesterBy() {
+        return requesterBy;
+    }
+
+    public User getRequesterTo() {
+        return requesterTo;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public LocalDateTime getRequestTime() {
+        return requestTime;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
 }

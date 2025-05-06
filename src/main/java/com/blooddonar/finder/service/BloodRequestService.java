@@ -14,6 +14,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class BloodRequestService {
@@ -77,5 +80,48 @@ public class BloodRequestService {
         }
 
         return finalDonors.size(); // Number of notified donors
+    }
+
+public List<Map<String, Object>> getBloodRequestsByRequesterId(Long requesterId) {
+    List<BloodRequest> bloodRequests = bloodRequestRepository.findByRequesterToId(requesterId);
+
+    // Filter out the ACCEPTED requests
+    List<Map<String, Object>> responseList = bloodRequests.stream()
+            .filter(req -> req.getStatus() != Status.ACCEPTED) // Exclude ACCEPTED requests
+            .map(req -> {
+                Map<String, Object> responseMap = new HashMap<>();
+                responseMap.put("id", req.getId());  // Add id explicitly
+                responseMap.put("bloodGroup", req.getBgGroup());
+                responseMap.put("district", req.getDistrict());
+                responseMap.put("city", req.getCity());
+                responseMap.put("message", req.getMessage());
+                responseMap.put("requesterId", req.getRequesterBy().getId());
+                responseMap.put("name", req.getRequesterBy().getName());
+                responseMap.put("email", req.getRequesterBy().getEmail());
+                responseMap.put("contactNumber", req.getRequesterBy().getPhone());
+                return responseMap;
+            })
+            .collect(Collectors.toList());
+
+    return responseList;
+}
+
+
+   public String acceptRequest(Long bloodRequestId) {
+        BloodRequest bloodRequest = bloodRequestRepository.findById(bloodRequestId)
+                .orElseThrow(() -> new RuntimeException("BloodRequest not found with ID: " + bloodRequestId));
+
+        bloodRequest.setStatus(Status.ACCEPTED);
+        bloodRequestRepository.save(bloodRequest);
+
+        User requesterTo = bloodRequest.getRequesterTo();
+        if (requesterTo != null) {
+            requesterTo.setLastDonationDate(LocalDate.now());
+            userRepository.save(requesterTo);
+        } else {
+            throw new RuntimeException("Requester user not found for this BloodRequest");
+        }
+
+        return "Blood request accepted and user's last donation date updated.";
     }
 }
